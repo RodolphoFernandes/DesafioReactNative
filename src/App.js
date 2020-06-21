@@ -25,16 +25,75 @@ export default function App() {
   }, []);
 
   async function handleLikeRepository(id) {
+    console.log(id);
     const response = await api.post(`/repositories/${id}/like`);  
+
+    const result = repositories.map(repository => {
+      if(repository.id == id)
+        return response.data;
+      else
+        return repository;
+    })
     
-    setRepositories([response.data])
+    setRepositories(result);
     
   }
 
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
+    <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
+          <SafeAreaView style={styles.container}>
+            <View style={styles.repositoryContainer}>
+
+            <FlatList                                  
+                    data={repositories}
+                    keyExtractor={repository => repository.id}
+                    renderItem={( { item: repository }) => (
+                      <>
+                      <Text style={styles.repository}>{repository.title}</Text>
+
+                        <View style={styles.techsContainer}>
+                          {repository.techs.map(tech => (
+                              <Text key={tech} style={styles.tech}>{tech}</Text>
+                          ))}  
+                        </View>
+
+                        <View style={styles.likesContainer}>
+                          <Text
+                            style={styles.likeText}
+                            // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
+                            testID={`repository-likes-${repository.id}`}
+                          >
+                            {`${repository.likes} curtidas`}
+                          </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleLikeRepository(repository.id)}
+                            // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+                            testID={`like-button-${repository.id}`}
+                          >
+                            <Text style={styles.buttonText}>Curtir</Text>
+                        </TouchableOpacity>
+
+                      </>
+                    )}
+                />
+             
+              
+            </View>
+          </SafeAreaView>
+    
+      {/* <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
+
+
+
+
+
+
+
       <FlatList 
         style={styles.repositoryContainer}
         data={repositories}
@@ -68,7 +127,7 @@ export default function App() {
             </>
         )}
       />
-      </SafeAreaView>
+      </SafeAreaView> */}
     </>
   );
 }
@@ -76,8 +135,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#7159c1",
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+    backgroundColor: "#7159c1"
+    //paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
   },
   repositoryContainer: {
     marginBottom: 15,
